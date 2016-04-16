@@ -1,4 +1,4 @@
-//
+    //
 //  AppDelegate.swift
 //  taskapp
 //
@@ -13,10 +13,37 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
 
-
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
         // Override point for customization after application launch.
+        
+        // Requesting the user permit the notification
+        let settings = UIUserNotificationSettings(forTypes: [UIUserNotificationType.Alert], categories: nil)
+        UIApplication.sharedApplication().registerUserNotificationSettings(settings)
+        
+        // Verifying if the app start is triggered by a notification
+        if let notification = launchOptions?[UIApplicationLaunchOptionsLocalNotificationKey] as? UILocalNotification {
+            // Canceling the notification
+            application.cancelLocalNotification(notification)
+        }
+        
         return true
+    }
+    
+    func application(application: UIApplication, didReceiveLocalNotification notification: UILocalNotification) {
+        
+        if application.applicationState == UIApplicationState.Active {
+            // If notified while the app is on the foreground, displaying the alert
+            let alertController = UIAlertController(title: "時間になりました", message: notification.alertBody, preferredStyle: .Alert)
+            let defaultAction = UIAlertAction(title: "OK", style: UIAlertActionStyle.Default, handler: nil)
+            alertController.addAction(defaultAction)
+            
+            window?.rootViewController!.presentViewController(alertController, animated: true, completion: nil)
+        } else {
+            // If notified while the app is on the background, only outputting the log
+            print("\(notification.alertBody)")
+        }
+        // Canceling the notification
+        application.cancelLocalNotification(notification)
     }
 
     func applicationWillResignActive(application: UIApplication) {
